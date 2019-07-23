@@ -82,6 +82,7 @@ class DrawRandom():
             if os.path.isfile(pts):  # 判断是否为文件夹，如果是判断所有文件就改成： os.path.isfile(p)
                 listr.append(p)
         return listr
+
     def add_df(self, df):
         longnum = df.shape[0]
         comlist = random.sample(self.tmp, longnum)

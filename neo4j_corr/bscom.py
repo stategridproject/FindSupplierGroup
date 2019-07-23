@@ -333,7 +333,7 @@ class SpiderSupplier():
         except:
             logger.info('no 对外投资')
             return dict_re
-        while(True):
+        while True:
             count = 0
             lenlist = []
             ttnum = 0
@@ -556,7 +556,7 @@ class SpiderSupplier():
                     dict_re[rlist][n] = tlist[0] if len(tlist) == 1 else tlist
                     count += 1
 
-        while(True):
+        while True:
             if number == 0:
                 break
             else:
@@ -638,7 +638,6 @@ class SpiderSupplier():
 
     def get_gdXX(self, dic_ip):
         dictt = {}
-
         js = 'window.open("https://www.sogou.com");'
         self.drive.execute_script(js)
         handles = self.drive.window_handles
@@ -866,7 +865,7 @@ class SpiderSupplier():
                     tlist = [i for i in tlist if i != '']
                     dict_re[rlist][n] = tlist[0] if len(tlist) == 1 else tlist
                     count += 1
-        while(True):
+        while True:
             if number == 0:
                 break
             else:
@@ -945,7 +944,7 @@ class SpiderSupplier():
                     tlist = [i for i in tlist if i != '']
                     dict_re[rlist][n] = tlist[0] if len(tlist) == 1 else tlist
                     count += 1
-        while(True):
+        while True:
             if number == 0:
                 break
             else:
@@ -1018,7 +1017,7 @@ class SpiderSupplier():
                     tlist = [i for i in tlist if i != '']
                     dict_re[rlist][n] = tlist[0] if len(tlist) == 1 else tlist
                     count += 1
-        while(True):
+        while True:
             if number == 0:
                 break
             else:

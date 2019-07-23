@@ -66,10 +66,10 @@ class CostEvaluation:
 
 
 if __name__ == "__main__":
-    material_price_file = '..\\raw\\RBL8.csv'
-    equation_file = '..\\raw\\水泥杆_成本公式.xlsx'
+    material_price_file = '../../data/raw/RBL8.csv'
+    equation_file = '../../data/raw/水泥杆_成本公式.xlsx'
     bid_kind_file = '..\\output\\bvalue\\csv\\水泥杆\\水泥杆_all_b_kind.csv'
-    need_file = '..\\raw\\需求一览表.xlsx'
+    need_file = '../../data/raw/需求一览表.xlsx'
     output_dir = '../output/cost'
     test = CostEvaluation(material_price_file=material_price_file, equation_file=equation_file, bid_kind_file=bid_kind_file, need_file=need_file, output_dir=output_dir)
     test()

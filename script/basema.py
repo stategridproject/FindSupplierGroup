@@ -147,7 +147,8 @@ class Model_mate_group():
                 number = 45
             else:
                 number = 20
-            """K-means
+            """
+            K-means
             """
             if shape == 1:
                 return -1

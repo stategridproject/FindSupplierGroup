@@ -16,19 +16,26 @@ def getlogger():
     p = os.path.join(basedir, "../../data/output/log/")
     if not os.path.exists(p):
         os.makedirs(p)
+
     logfile = os.path.join(basedir, "../../data/output/log/pretreate.log")
     logger = logging.getLogger('predeal')
     logger.setLevel(logging.DEBUG)
-    fh = logging.FileHandler(logfile, encoding="utf-8")
-    fh.setLevel(logging.DEBUG)
+
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    fh = logging.FileHandler(logfile, encoding="utf-8")
+    fh.setLevel(logging.DEBUG)
     fh.setFormatter(formatter)
+
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG)
     ch.setFormatter(formatter)
+
     logger.addHandler(fh)
+
     logger.addHandler(ch)
+
     return logger
 
 
@@ -49,7 +56,8 @@ class preprocess():
             os.makedirs(self.processplace)
 
     def read_csv(self, point, index_vol=0, encoding='GBK', dtype=False):
-        """读取csv格式文件
+        """
+        读取csv格式文件
         """
         if 1 - dtype:
             data = pd.read_csv(point, index_col=index_vol,
@@ -61,19 +69,22 @@ class preprocess():
         return data
 
     def save_csv(self, data, point):
-        """存储csv格式文件
+        """
+        存储csv格式文件
         """
         data.to_csv(point, encoding="GBK")
 
     def read_excel(self, point, sheet=0, header=0, index_col=None):
-        """读取excel格式文件
+        """
+        读取excel格式文件
         """
         data = pd.read_excel(point, sheet_name=sheet,
                              header=header, index_col=index_col)
         return data
 
     def create_type_csv(self):
-        """制作品类合并表并统一品类名称
+        """
+        制作品类合并表并统一品类名称
         """
         df1 = self.read_excel(os.path.join(
             self.folderpath, '开标一览表.xlsx'), sheet='Sheet1')
@@ -119,7 +130,8 @@ class preprocess():
         self.save_csv(rr, os.path.join(self.processplace, 'pivot_data.csv'))
 
     def create_masplist_csv(self):
-        """拆分行报价汇总表
+        """
+        拆分行报价汇总表
         """
         df_dict = self.read_excel(os.path.join(
             self.folderpath, '行报价汇总.xlsx'), None, 1)
@@ -130,7 +142,8 @@ class preprocess():
             count += 1
 
     def create_ma_comb(self):
-        """制作物料合并表并替换品类名
+        """
+        制作物料合并表并替换品类名
         """
         tmp_df = self.read_excel(os.path.join(
             self.folderpath, '需求一览表.xlsx'), sheet='Sheet1')
@@ -187,22 +200,23 @@ class preprocess():
                       os.path.join(self.processplace, 'matr_all.csv'))
 
     def create_basetable_csv(self):
-        """制作供应商脱敏表
         """
-        dfl = self.read_csv(os.path.join(self.processplace, 'pivot_data.csv'))
-        comlist = dfl['供应商名称'].value_counts().index.values
-        rst = pd.DataFrame({'com': comlist})
-        self.tlist = ["%05d" % i for i in range(99999 + 1)]
-
+        制作供应商脱敏表
+        """
         def func(df):
             number1 = random.sample(self.tlist, 1)[0]
             self.tlist.remove(number1)
             return number1
+        dfl = self.read_csv(os.path.join(self.processplace, 'pivot_data.csv'))
+        comlist = dfl['供应商名称'].value_counts().index.values
+        rst = pd.DataFrame({'com': comlist})
+        self.tlist = ["%05d" % i for i in range(99999 + 1)]
         rst.loc[:, 'num'] = rst['com'].apply(func)
         self.save_csv(rst, os.path.join(self.processplace, 'base_table.csv'))
 
     def deal_ma_csv(self):
-        """去物料异常值
+        """
+        去物料异常值
         """
         df1 = self.read_csv(os.path.join(self.processplace, 'matr_all.csv'))
         df1 = df1.drop_duplicates()
@@ -221,7 +235,8 @@ class preprocess():
         self.save_csv(rr, os.path.join(self.processplace, 'matr_all.csv'))
 
     def deal_type_csv(self):
-        """去品类异常值
+        """
+        去品类异常值
         """
         df1 = self.read_csv(os.path.join(self.processplace, 'pivot_data.csv'))
         df1 = df1.drop_duplicates()
@@ -230,7 +245,8 @@ class preprocess():
         self.save_csv(rr, os.path.join(self.processplace, 'pivot_data.csv'))
 
     def __call__(self):
-        """对初始数据进行处理，产生两张通用表
+        """
+        对初始数据进行处理，产生两张通用表
         1.制作品类合并表
         2.制作物料合并表
         3.去除两表中的数据异常值

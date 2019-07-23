@@ -2,7 +2,8 @@
 import os
 import logging
 import pandas as pd
-
+from tqdm import tqdm
+from glob import glob
 
 def getlogger():
     basedir = os.path.dirname(os.path.realpath(__file__))
@@ -29,11 +30,14 @@ logger = getlogger()
 
 
 class Association:
-    def __init__(self, tyname, batname=[], geo_rank='province'):
+    def __init__(self, tyname, batname=[], geo_rank='province', geo_file='../../data/raw/supplier_geo.csv', txt_dir='../../data/raw/company_relation', relation_file='../../data/processed/relations.csv'):
         self.name = tyname
         self.geo_rank = geo_rank
         self.batname = batname
-
+        self.geo_file = geo_file
+        self.txt_dir = txt_dir
+        self.txt_files = glob('{}/*.txt'.format(self.txt_dir))
+        self.relation_file = relation_file
         basedir = os.path.dirname(os.path.realpath(__file__))
         self.folderpath = os.path.join(basedir, "../../data/processed/")
         if not os.path.exists(self.folderpath):
@@ -48,6 +52,25 @@ class Association:
         else:
             self.geo_groupby_list = ['供应商名称', 'province']
         pass
+
+    def preprocess(self):
+        for file in tqdm(self.txt_files):
+            count = 0
+            supplier1, supplier2 = os.path.basename(file).split('.')[0].split('-')
+            min_relation = 100
+            try:
+                with open(file, 'r') as f:
+                    for line in f.readlines():
+                        if '国务院国有资产监督管理委员会' in line.strip():
+                            continue
+                        count += 1
+                        if len(line.split('-')) < min_relation:
+                            min_relation = len(line.split('-'))
+                    if count > 0:
+                        self.relation.loc[','.join(sorted([supplier1, supplier2])), 'relation_count'] = count
+                        self.relation.loc[','.join(sorted([supplier1, supplier2])), 'min_relation'] = min_relation
+            except:
+                print('Error:' + file)
 
     def read_csv(self, point, index_vol=0, encoding='GBK', dtype=False):
         if 1 - dtype:
@@ -84,7 +107,8 @@ class Association:
             os.makedirs(self.file_comtype)
 
     def get_community(self, pair_list):
-        """根据图数据关系，获取群体间关联
+        """
+        根据图数据关系，获取群体间关联
         """
         group = {}
         group_num = 0
@@ -103,7 +127,8 @@ class Association:
                              'name': list(group.keys())})
 
     def get_person_data(self, df):
-        """使用图数据库进行包内供应商关联计算
+        """
+        使用图数据库进行包内供应商关联计算
         """
         df = df.copy()
         self.pac = df.iloc[0]['包号']
@@ -119,7 +144,8 @@ class Association:
         logger.info('select {} over {}'.format(self.ComID, self.pac))
 
     def get_type(self, df):
-        """产生地理相关供应商与利益相关供应商
+        """
+        产生地理相关供应商与利益相关供应商
         """
         self.rst1 = pd.DataFrame()  # relation
         self.rst2 = pd.DataFrame()  # geo
@@ -144,7 +170,8 @@ class Association:
         logger.info('save file success')
 
     def all_operate(self, df1):
-        """对每个物料各个批次进行操作
+        """
+        对每个物料各个批次进行操作
         """
         type_name = df1.iloc[0]['分标名称']
         if len(self.name) == 0:
@@ -158,7 +185,8 @@ class Association:
         df1.groupby(['分标编号']).filter(self.get_type)  # 物料群体
 
     def change_name(self, df):
-        """供应商名称脱敏化
+        """
+        供应商名称脱敏化
         """
         df2 = self.read_csv(os.path.join(
             self.folderpath, 'base_table.csv'), dtype=True)
@@ -170,10 +198,16 @@ class Association:
     def __call__(self):
         df1 = self.read_csv(os.path.join(self.folderpath, 'pivot_data.csv'),
                             encoding='GBK')
-        self.relation = pd.read_csv(os.path.join(
-            self.folderpath, 'relations.csv'), encoding='gbk', index_col=0)
-        self.geo = pd.read_csv(os.path.join(self.folderpath,
-                                            'supplier_geo.csv'),
+        # self.get_type(df1)
+        if not os.path.exists(self.relation_file):
+            self.relation = pd.DataFrame()
+            self.preprocess()
+            self.relation.to_csv(self.relation_file, encoding='gbk')
+        else:
+            self.relation = pd.read_csv(self.relation_file, encoding='gbk', index_col=0)
+        # self.relation = pd.read_csv(os.path.join(
+        #     self.folderpath, 'relations.csv'), encoding='gbk', index_col=0)
+        self.geo = pd.read_csv(self.geo_file,
                                encoding='utf-8', index_col=0)[['供应商名称',
                                                                'province',
                                                                'city',

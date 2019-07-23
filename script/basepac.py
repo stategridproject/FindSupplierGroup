@@ -79,14 +79,16 @@ class Model_cate_group():
         return x.T
 
     def samplepearson(self, data):
-        """计算相关系数
+        """
+        计算相关系数
         """
         data = data - data.mean(axis=0)
         corr = data.T.corr('pearson')
         return pd.DataFrame(corr)
 
     def getfinlist(self, y_ied, name, df1):
-        """对聚类结果进行筛选，选择合适群体
+        """
+        对聚类结果进行筛选，选择合适群体
         """
         finlist = []  # 供应商列表
         tlist = []  # 新类别顺序名
@@ -114,7 +116,8 @@ class Model_cate_group():
         return finlist, tlist
 
     def cal_kmeans_para(self, shape):
-        """设置K值
+        """
+        设置K值
         """
         if self.number == 0:
             if shape > 100:
@@ -123,7 +126,8 @@ class Model_cate_group():
                 number = 5
             else:
                 number = 15
-            """K-means
+            """
+            K-means
             """
             if shape == 1:
                 return -1
@@ -142,7 +146,8 @@ class Model_cate_group():
             os.makedirs(self.file_comtype)
 
     def save_pearson(self, rst, comname, y_pred):
-        """保存pearson相关系数方法
+        """
+        保存pearson相关系数方法
         """
         save_place = os.path.join(self.outputplace,
                                   './pearson_category/{}/'.format(self.tname))
@@ -156,7 +161,8 @@ class Model_cate_group():
         self.save_csv(rst, save_file)
 
     def get_person_data(self, df):
-        """利用K-means对供应商群体进行划分，并进行筛选
+        """
+        利用K-means对供应商群体进行划分，并进行筛选
         1.产生pearson相关系数表
         2.进行Kmeans聚类并筛选群体
         3.将结果保存
@@ -205,7 +211,8 @@ class Model_cate_group():
         logger.info('select {} over'.format(self.ComID))
 
     def get_type(self, df):
-        """对表中同一个品类所有数据进行处理
+        """
+        对表中同一个品类所有数据进行处理
         """
         self.rst = pd.DataFrame()
         type_name = df.iloc[0]['分标名称']
@@ -222,7 +229,8 @@ class Model_cate_group():
         logger.info('save file success')
 
     def change_name(self, df):
-        """脱敏函数
+        """
+        脱敏函数
         """
         df2 = self.read_csv(os.path.join(
             self.folderpath, 'base_table.csv'), dtype=True)
@@ -232,7 +240,8 @@ class Model_cate_group():
         return rr
 
     def __call__(self):
-        """输入的品类，批次编号
+        """
+        输入的品类，批次编号
         --产生群体csv表，中间数据pearson相关数据csv表
         """
         df1 = self.read_csv(os.path.join(self.folderpath, 'pivot_data.csv'))
